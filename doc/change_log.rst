@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+Version 1.0.9
+
+* allows for vector targets, to support one-hot or multi-label encoding
+
 Version 1.0.8
 
 * added function for creating TS_Data from pandas
