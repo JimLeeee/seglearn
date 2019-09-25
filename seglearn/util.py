@@ -172,3 +172,32 @@ def ts_stats(Xt, y, fs=1.0, class_labels=None):
                'by_class': by_class}
 
     return results
+
+def interp_sort(t, x):
+    """
+    sorts time series x by timestamp t, removing duplicates in the first entry
+
+    this is required to user the scipy interp1d methods which returns nan when there are duplicate
+    values for t_min
+
+    this can be removed once the scipy issue is fixed
+
+    Parameters
+    ----------
+    t : array-like, shape [n]
+        timestamps
+    x : array-like, shape [n, ]
+        data
+
+    Returns
+    -------
+
+    """
+    ind = np.argsort(t)
+    t = t[ind]
+    gt = t > t[0]  # prevents nan bring returned when there are duplicate values of min(x)
+    gt[0] = True
+    t = t[gt]
+    ind = ind[gt]
+    x = np.take(x, ind, axis=0)
+    return t, x

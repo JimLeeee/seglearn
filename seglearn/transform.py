@@ -13,7 +13,7 @@ from sklearn.utils.metaestimators import _BaseComposition
 
 from .base import TS_Data
 from .feature_functions import base_features
-from .util import get_ts_data_parts, check_ts_data
+from .util import get_ts_data_parts, check_ts_data, interp_sort
 
 __all__ = ['SegmentX', 'SegmentXY', 'SegmentXYForecast', 'PadTrunc', 'InterpLongToWide', 'Interp',
            'FeatureRep', 'FeatureRepMix', 'FunctionTransformer']
@@ -721,16 +721,19 @@ class Interp(BaseEstimator, XyTransformerMixin):
     categorical_target : bool
         set to True for classification problems to use nearest instead of linear interp for  the
         target
+    assume_sorted : bool
+        assume time series data is sorted by timestamp
 
     """
 
-    def __init__(self, sample_period, kind='linear', categorical_target=False):
+    def __init__(self, sample_period, kind='linear', categorical_target=False, assume_sorted=True):
         if not sample_period > 0:
             raise ValueError("sample_period must be >0 (was %f)" % sample_period)
 
         self.sample_period = sample_period
         self.kind = kind
         self.categorical_target = categorical_target
+        self.assume_sorted = assume_sorted
 
     def fit(self, X, y=None):
         """
@@ -756,6 +759,10 @@ class Interp(BaseEstimator, XyTransformerMixin):
         return self
 
     def _interp(self, t_new, t, x, kind):
+
+        if not self.assume_sorted:
+            t, x = interp_sort(t, x)
+
         interpolator = interp1d(t, x, kind=kind, copy=False, bounds_error=False,
                                 fill_value="extrapolate", assume_sorted=True)
         return interpolator(t_new)
@@ -849,6 +856,8 @@ class InterpLongToWide(BaseEstimator, XyTransformerMixin):
     categorical_target : bool
         set to True for classification problems to use nearest instead of linear interp for  the
         target
+    assume_sorted : bool
+        assume time series data are sorted by time stamp
 
     Examples
     --------
@@ -869,13 +878,14 @@ class InterpLongToWide(BaseEstimator, XyTransformerMixin):
 
     """
 
-    def __init__(self, sample_period, kind='linear', categorical_target=False):
+    def __init__(self, sample_period, kind='linear', categorical_target=False, assume_sorted=True):
         if not sample_period > 0:
             raise ValueError("sample_period must be >0 (was %f)" % sample_period)
 
         self.sample_period = sample_period
         self.kind = kind
         self.categorical_target = categorical_target
+        self.assume_sorted = assume_sorted
 
     def fit(self, X, y=None):
         """
@@ -917,6 +927,10 @@ class InterpLongToWide(BaseEstimator, XyTransformerMixin):
                 raise ValueError("Unique identifier var_types not consistent between time series")
 
     def _interp(self, t_new, t, x, kind):
+
+        if not self.assume_sorted:
+            t, x = interp_sort(t, x)
+
         interpolator = interp1d(t, x, kind=kind, copy=False, bounds_error=False,
                                 fill_value="extrapolate", assume_sorted=True)
         return interpolator(t_new)
