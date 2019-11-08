@@ -11,9 +11,9 @@ This is a basic example using a convolutional recurrent neural network to learn 
 
 import matplotlib.pyplot as plt
 import numpy as np
-from keras.layers import Dense, LSTM, Conv1D
-from keras.models import Sequential
-from keras.wrappers.scikit_learn import KerasClassifier
+from tensorflow.python.keras.layers import Dense, LSTM, Conv1D
+from tensorflow.python.keras.models import Sequential
+from tensorflow.python.keras.wrappers.scikit_learn import KerasClassifier
 from pandas import DataFrame
 from sklearn.model_selection import train_test_split
 
