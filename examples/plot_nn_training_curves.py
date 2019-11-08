@@ -70,8 +70,8 @@ pipe = Pype([('seg', SegmentX(order='C')),
 
 pipe.fit(X_train, y_train)
 print(DataFrame(pipe.history.history))
-ac_train = pipe.history.history['acc']
-ac_val = pipe.history.history['val_acc']
+ac_train = pipe.history.history['accuracy']
+ac_val = pipe.history.history['val_accuracy']
 epoch = np.arange(len(ac_train)) + 1
 
 ##############################################
